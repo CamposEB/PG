@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>For you ❤️</title>
+
+<style>
+body {
+  margin:0;
+  background:black;
+  font-family: 'Georgia', serif;
+  overflow:hidden;
+  color:white;
+}
+
+/* FADE IN */
+#fade {
+  position:absolute;
+  width:100%;
+  height:100%;
+  background:black;
+  z-index:10;
+  animation: fadeOut 3s forwards;
+}
+@keyframes fadeOut { to { opacity:0; visibility:hidden; } }
+
+/* VIDEO CENTRALIZADO */
+.video-box {
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+  width:90%;
+  max-width:420px;
+  border-radius:20px;
+  overflow:hidden;
+  box-shadow:0 0 40px rgba(255,100,150,0.2);
+}
+video {
+  width:100%;
+  filter: brightness(0.75);
+  animation: zoom 20s infinite alternate ease-in-out;
+}
+@keyframes zoom { from { transform: scale(1); } to { transform: scale(1.1); } }
+
+/* TEXTO ABAIXO DO VIDEO */
+#musicName {
+  position:absolute;
+  left:50%;
+  transform:translateX(-50%);
+  font-size:16px;
+  color:#ffd1dc;
+  text-align:center;
+  background: rgba(0,0,0,0.3);
+  padding:6px 12px;
+  border-radius:12px;
+  pointer-events:none;
+  
+  /* calculando verticalmente abaixo do vídeo centralizado */
+  top: calc(50% + 210px); /* 210px = metade da altura do vídeo (aprox. 420px / 2) + margem */
+}
+
+/* TEXTO CANTO INFERIOR DIREITO */
+#cornerText {
+  position:fixed;
+  bottom:15px;
+  right:15px;
+  font-size:14px;
+  color:#ffccd5;
+  text-align:right;
+  background: rgba(0,0,0,0.3);
+  padding:8px 12px;
+  border-radius:10px;
+  pointer-events:none;
+  max-width:220px;
+  line-height:1.4;
+  box-shadow: 0 0 10px rgba(255, 150, 200, 0.2);
+}
+
+/* MEMÓRIAS */
+.memory {
+  position:absolute;
+  font-size:14px;
+  opacity:0;
+  animation: floatMemory 6s forwards;
+  color:#fafafa;
+}
+@keyframes floatMemory {
+  0% {opacity:0; transform:translateY(0);}
+  20% {opacity:1;}
+  100% {opacity:0; transform:translateY(-120px);}
+}
+
+/* MENSAGEM FINAL */
+#finalText {
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+  text-align:center;
+  font-size:22px;
+  width:80%;
+  opacity:0;
+  transition:2s;
+}
+#finalText.show { opacity:1; }
+
+/* ESTRELAS DE FUNDO */
+canvas#stars { position:absolute; top:0; left:0; width:100%; height:100%; z-index:-1; }
+</style>
+</head>
+
+<body>
+
+<div id="fade"></div>
+
+<canvas id="stars"></canvas>
+
+<div class="video-box">
+  <video id="video" src="assets/video.mp4"></video>
+</div>
+
+<div id="musicName">🎵 Música: Iris - The Goo Goo Dolls</div>
+
+<div id="finalText">
+  Depois de todo esse tempo...<br><br>
+  você ainda é minha pessoa favorita.<br><br>
+  ❤️ Yasmin ❤️
+</div>
+
+<div id="cornerText">
+  Você é especial para várias pessoas, nunca se esqueça disso!!!<br>
+  Tenha um ótimo dia, Pucca ❤️
+</div>
+
+<audio id="music" src="assets/musica.mp3"></audio>
+
+<script>
+// VIDEO E MÚSICA
+const video = document.getElementById("video");
+const music = document.getElementById("music");
+
+// MEMÓRIAS
+const memories = ["Pucca","Garu","Rafael","Yasmin"];
+const colors = ["#ff7eb9", "#ffd1dc", "#fff0f5"];
+
+function startMemories(){
+  setInterval(()=>{
+    let m = document.createElement("div");
+    m.className="memory";
+    m.innerHTML = memories[Math.floor(Math.random()*memories.length)];
+    m.style.left = Math.random()*90+"%";
+    m.style.top = "70%";
+    m.style.color = colors[Math.floor(Math.random()*colors.length)];
+    m.style.fontSize = (14 + Math.random()*8) + "px";
+    document.body.appendChild(m);
+    setTimeout(()=>m.remove(),6000);
+  },1200);
+}
+
+// INTERAÇÃO AO TOQUE
+video.addEventListener("click", (e)=>{
+  for(let i=0;i<8;i++){
+    let p = document.createElement("div");
+    p.className="memory";
+    p.innerHTML = Math.random()>0.5 ? "❤️" : "✨";
+    p.style.left = (e.clientX + Math.random()*40-20) + "px";
+    p.style.top = (e.clientY + Math.random()*40-20) + "px";
+    p.style.fontSize = (12 + Math.random()*12) + "px";
+    p.style.color = colors[Math.floor(Math.random()*colors.length)];
+    document.body.appendChild(p);
+    setTimeout(()=>p.remove(),2500);
+  }
+});
+
+// FINAL COM PARTICULAS
+function createMemoryParticle(){
+  let p = document.createElement("div");
+  p.className="memory";
+  p.innerHTML="❤️";
+  p.style.left = Math.random()*window.innerWidth+"px";
+  p.style.top = window.innerHeight+"px";
+  p.style.fontSize = (10 + Math.random()*14)+"px";
+  p.style.color = colors[Math.floor(Math.random()*colors.length)];
+  document.body.appendChild(p);
+  let top = window.innerHeight;
+  let interval = setInterval(()=>{
+    top -= 2;
+    p.style.top = top+"px";
+    if(top < -50){p.remove(); clearInterval(interval);}
+  },16);
+}
+
+// FINAL
+video.addEventListener("ended", ()=>{
+  const final = document.getElementById("finalText");
+  final.classList.add("show");
+  for(let i=0;i<30;i++){ setTimeout(()=>createMemoryParticle(), i*100); }
+});
+
+// ESTRELAS PISCANDO
+const canvas = document.getElementById("stars");
+const ctx = canvas.getContext("2d");
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+const stars = [];
+for(let i=0;i<100;i++){
+  stars.push({x:Math.random()*canvas.width, y:Math.random()*canvas.height, r:Math.random()*1.5+0.5, alpha:Math.random(), delta:0.01*Math.random()});
+}
+
+function drawStars(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  for(let s of stars){
+    ctx.globalAlpha = s.alpha;
+    ctx.fillStyle = "#fff";
+    ctx.beginPath();
+    ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
+    ctx.fill();
+    s.alpha += s.delta;
+    if(s.alpha<=0 || s.alpha>=1) s.delta *= -1;
+  }
+  requestAnimationFrame(drawStars);
+}
+drawStars();
+
+// AUTOPLAY APÓS 2s
+window.onload = ()=>{
+  setTimeout(()=>{
+    video.play();
+    music.play();
+    startMemories();
+  },2000);
+};
+</script>
+
+</body>
+</html>
